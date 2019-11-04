@@ -45,6 +45,28 @@ public class AppUserDaoImpl {
     }
 
     @Transactional(rollbackFor = RuntimeException.class)
+    public List<AppUser> findByName(String name) {
+
+        TypedQuery<AppUser> query = entityManager
+                .createQuery("SELECT u FROM AppUser u WHERE u.name= ?1", AppUser.class);
+
+        query.setParameter(1, name);
+
+        return query.getResultList();
+    }
+
+    @Transactional(rollbackFor = RuntimeException.class)
+    public List<AppUser> findByEmail(String email){
+
+        TypedQuery<AppUser> query = entityManager
+                .createQuery("SELECT u FROM AppUser u WHERE u.email= ?1", AppUser.class);
+
+        query.setParameter(1, email);
+
+        return  query.getResultList();
+    }
+
+    @Transactional(rollbackFor = RuntimeException.class)
     public void delete (int id){
         Optional<AppUser> result = findById(id);
 
