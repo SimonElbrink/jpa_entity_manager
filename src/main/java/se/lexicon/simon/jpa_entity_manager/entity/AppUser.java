@@ -1,9 +1,6 @@
 package se.lexicon.simon.jpa_entity_manager.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -14,15 +11,22 @@ public class AppUser {
     private int id;
 
     private String name;
+
+    @Column(unique = true)
     private String email;
 
-    public AppUser() {}
 
-    public AppUser(int id, String name, String email) {
+    public AppUser(int id, String name, String email){
         this.id = id;
-        this.name = name;
-        this.email = email;
+        setName(name);
+        setEmail(email);
     }
+
+    public AppUser(String name, String email) {
+        this(0, name, email);
+    }
+
+    public AppUser(){ }
 
     public int getId() {
         return id;
