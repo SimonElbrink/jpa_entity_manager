@@ -12,36 +12,32 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class AppUserDaoImpl {
+public class AppUserDaoImpl implements AppUserDao {
 
     @PersistenceContext
     EntityManager entityManager;
 
 
+    @Override
     @Transactional
-    public List<AppUser> findAll(){
-        List<AppUser> result = new ArrayList<>();
-        TypedQuery<AppUser> query =
-                entityManager.createQuery("SELECT u FROM AppUser u", AppUser.class);
+    public List<AppUser> findAll() {
 
+        List<AppUser> result = new ArrayList<>();
+        TypedQuery<AppUser> query = entityManager.createQuery("SELECT u FROM AppUser u",AppUser.class);
         result = query.getResultList();
         return result;
     }
 
+    @Override
     @Transactional
-    public Optional<AppUser> findById(int id){
-        return Optional.ofNullable(entityManager.find(AppUser.class, id));
-    }
+    public Optional<AppUser> findById(int id) {
+        AppUser result = entityManager.find(AppUser.class, 1);
 
-    @Transactional(rollbackFor = RuntimeException.class)
-    public AppUser save (AppUser appUser){
-
-        if(appUser.getId() != 0){
-            update(appUser);
+        if(result == null){
+            return Optional.empty();
+        }else{
+            return Optional.of(result);
         }
-
-       entityManager.persist(appUser);
-       return appUser;
     }
 
     @Transactional(rollbackFor = RuntimeException.class)
@@ -66,21 +62,40 @@ public class AppUserDaoImpl {
         return  query.getResultList();
     }
 
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void delete (int id){
+    @Override
+    @Transactional
+    public AppUser save(AppUser appUser) {
+
+        if(appUser == null) {
+            throw new IllegalArgumentException("AppUser was " + appUser);
+        }
+        if (appUser.getId() != 0){
+            update(appUser);
+        }
+
+        entityManager.persist(appUser);
+        return appUser;
+    }
+
+    @Override
+    @Transactional
+    public void delete(int id) {
         Optional<AppUser> result = findById(id);
 
         entityManager.remove(result.orElseThrow(IllegalArgumentException::new));
     }
 
-    @Transactional(rollbackFor = RuntimeException.class)
-    public AppUser update (AppUser appUser){
+    @Override
+    @Transactional
+    public AppUser update(AppUser appUser) {
+        if (appUser == null){
+            throw new IllegalArgumentException("AppUser was " + appUser);
+        }
 
-        if(appUser.getId() == 0){
+        if (appUser.getId() == 0){
             return save(appUser);
         }
 
         return entityManager.merge(appUser);
     }
-
 }
